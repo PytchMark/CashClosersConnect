@@ -33,6 +33,7 @@ Required variables:
 - `CRM_APP_NAME`
 - `NODE_ENV`
 - `PORT`
+- Optional Cloud Run admin login: `CRM_ADMIN_USERNAME` and/or `CRM_ADMIN_EMAIL`, plus either `CRM_ADMIN_PASSCODE_HASH` (recommended) or `CRM_ADMIN_PASSCODE` (quick setup).
 
 ## Run (Local)
 ```bash
@@ -55,9 +56,24 @@ gcloud run deploy cashclosers-crm \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
-  --set-env-vars SUPABASE_URL=...,SUPABASE_SERVICE_ROLE_KEY=...,JWT_SECRET=...,CRM_APP_NAME='BizyDepo Sales OS',NODE_ENV=production
+  --set-env-vars SUPABASE_URL=...,SUPABASE_SERVICE_ROLE_KEY=...,JWT_SECRET=...,CRM_APP_NAME='BizyDepo Sales OS',NODE_ENV=production,CRM_ADMIN_USERNAME=admin,CRM_ADMIN_EMAIL=admin@example.com,CRM_ADMIN_PASSCODE_HASH='...bcrypt-hash...'
 ```
 
+
+
+## Cloud Run Admin Login via Env Vars
+You can allow admin login without a DB user by setting env vars on Cloud Run:
+- `CRM_ADMIN_USERNAME` and/or `CRM_ADMIN_EMAIL`
+- `CRM_ADMIN_ROLE` (defaults to `manager`)
+- `CRM_ADMIN_PASSCODE_HASH` (recommended bcrypt hash) or `CRM_ADMIN_PASSCODE`
+- If `CRM_ADMIN_PASSCODE_HASH` is not a bcrypt hash string, it will be treated as a plaintext passcode value for backward compatibility.
+
+Login flow checks env-admin credentials first, then falls back to DB (`crm_users`).
+
+Example (set hashed passcode):
+```bash
+node -e "const bcrypt=require('bcryptjs'); bcrypt.hash(process.argv[1],10).then(h=>console.log(h));" 'YourStrongPasscode'
+```
 
 ## Cloud Run Troubleshooting (PORT=8080 startup error)
 If Cloud Run reports that the container did not listen on `PORT=8080` in time:
@@ -75,6 +91,11 @@ If Cloud Run reports that the container did not listen on `PORT=8080` in time:
 - Run `db/schema.sql` in Supabase SQL editor (creates CRM tables).
 - Then run `db/seed.sql` (creates sample manager, agent, account, and pipeline stages).
 - Verify your Cloud Run env vars point to the same Supabase project where you ran the SQL.
+
+### 3) Invalid credentials with env-admin set
+- Ensure your Cloud Run revision includes `CRM_ADMIN_USERNAME` or `CRM_ADMIN_EMAIL`.
+- If using `CRM_ADMIN_PASSCODE_HASH`, it should look like a bcrypt hash (`$2a$...`, `$2b$...`, `$2y$...`).
+- If you set a plain value in `CRM_ADMIN_PASSCODE_HASH` by mistake, login now accepts it as plain text; you can also move it to `CRM_ADMIN_PASSCODE`.
 
 ## Database Schema
 Full schema is in `db/schema.sql` and includes:
