@@ -456,6 +456,14 @@ app.get('/api/crm/contact/:id/timeline', auth, async (req, res) => {
   res.json({ ok: true, notes: notes || [], activities: activities || [] });
 });
 
+app.use('/api', (_req, res) => {
+  return sendError(res, 404, 'API route not found.', 'NOT_FOUND');
+});
+
+app.get('*', (_req, res) => {
+  return res.redirect('/crm/login');
+});
+
 app.use((err, _req, res, _next) => {
   console.error(err);
   return sendError(res, 500, 'Internal server error.', 'INTERNAL_ERROR');
