@@ -161,6 +161,8 @@ const toLeadRow = (lead, stageMap) => ({
 });
 
 app.get('/health', (_req, res) => res.json({ ok: true, app: process.env.CRM_APP_NAME || 'CRM' }));
+app.get('/', (_req, res) => res.redirect('/crm/login'));
+app.get('/crm', (_req, res) => res.redirect('/crm/login'));
 
 app.get('/crm/login', (_req, res) => res.sendFile(path.join(__dirname, 'public/crm/login.html')));
 app.get('/crm/agent', (_req, res) => res.sendFile(path.join(__dirname, 'public/crm/agent.html')));

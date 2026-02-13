@@ -66,6 +66,16 @@ If Cloud Run reports that the container did not listen on `PORT=8080` in time:
 - Verify app health endpoint: `GET /health` (does not require DB access).
 - This app now lazy-initializes Supabase, so missing Supabase env vars no longer crash boot; CRM API calls will return a structured `MISSING_ENV` error until vars are configured.
 
+## Common First-Run Issues
+### 1) `Cannot GET /`
+- Root URL now redirects to `/crm/login`.
+- You can always open the app directly at `/crm/login`.
+
+### 2) App opens but shows no data
+- Run `db/schema.sql` in Supabase SQL editor (creates CRM tables).
+- Then run `db/seed.sql` (creates sample manager, agent, account, and pipeline stages).
+- Verify your Cloud Run env vars point to the same Supabase project where you ran the SQL.
+
 ## Database Schema
 Full schema is in `db/schema.sql` and includes:
 - `crm_users`
