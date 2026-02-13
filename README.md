@@ -66,6 +66,7 @@ You can allow admin login without a DB user by setting env vars on Cloud Run:
 - `CRM_ADMIN_USERNAME` and/or `CRM_ADMIN_EMAIL`
 - `CRM_ADMIN_ROLE` (defaults to `manager`)
 - `CRM_ADMIN_PASSCODE_HASH` (recommended bcrypt hash) or `CRM_ADMIN_PASSCODE`
+- If `CRM_ADMIN_PASSCODE_HASH` is not a bcrypt hash string, it will be treated as a plaintext passcode value for backward compatibility.
 
 Login flow checks env-admin credentials first, then falls back to DB (`crm_users`).
 
@@ -90,6 +91,11 @@ If Cloud Run reports that the container did not listen on `PORT=8080` in time:
 - Run `db/schema.sql` in Supabase SQL editor (creates CRM tables).
 - Then run `db/seed.sql` (creates sample manager, agent, account, and pipeline stages).
 - Verify your Cloud Run env vars point to the same Supabase project where you ran the SQL.
+
+### 3) Invalid credentials with env-admin set
+- Ensure your Cloud Run revision includes `CRM_ADMIN_USERNAME` or `CRM_ADMIN_EMAIL`.
+- If using `CRM_ADMIN_PASSCODE_HASH`, it should look like a bcrypt hash (`$2a$...`, `$2b$...`, `$2y$...`).
+- If you set a plain value in `CRM_ADMIN_PASSCODE_HASH` by mistake, login now accepts it as plain text; you can also move it to `CRM_ADMIN_PASSCODE`.
 
 ## Database Schema
 Full schema is in `db/schema.sql` and includes:
