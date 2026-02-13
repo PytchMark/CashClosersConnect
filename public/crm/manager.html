@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Manager Portal</title><link rel="stylesheet" href="/static/crm/styles.css"></head>
+<body><div class="app"><aside class="sidebar"><div class="brand">Manager CRM</div>
+<button class="nav-btn active" data-tab="overview">Overview</button>
+<button class="nav-btn" data-tab="pipelines">Pipelines</button>
+<button class="nav-btn" data-tab="contacts">Contacts (All)</button>
+<button class="nav-btn" data-tab="import">Import</button>
+<button class="nav-btn" data-tab="agents">Agents</button>
+<button class="nav-btn" data-tab="accounts">Accounts</button>
+<button class="nav-btn" data-tab="settings">Settings</button>
+</aside><main class="main"><div class="header"><input id="search" placeholder="Search contacts"><div class="chip" id="userChip"></div></div>
+<section id="overview" class="tab card"><h3>Overview</h3><div class="stats" id="stats"></div></section>
+<section id="pipelines" class="tab card hidden"><h3>Pipelines</h3><div class="grid-2"><input id="pipelineName" placeholder="New Pipeline Name"><button id="createPipeline">Create Pipeline</button></div><div id="pipelineList"></div></section>
+<section id="contacts" class="tab card hidden"><h3>All Contacts</h3><table class="table" id="contactsTable"></table></section>
+<section id="import" class="tab card hidden"><h3>CSV Import</h3><input type="file" id="csvFile" accept=".csv"><button id="importBtn">Import Contacts</button><p id="importMsg"></p></section>
+<section id="agents" class="tab card hidden"><h3>Agents</h3><div class="grid-2"><input id="agentEmail" placeholder="Email"><input id="agentUser" placeholder="Username"><input id="agentPass" placeholder="Passcode"><button id="addAgent">Create Agent</button></div><div id="agentList"></div></section>
+<section id="accounts" class="tab card hidden"><h3>Accounts</h3><div class="grid-2"><input id="accountName" placeholder="Account Name"><input id="industry" placeholder="Industry"><button id="createAccount">Create Account</button></div><div id="accountList"></div></section>
+<section id="settings" class="tab card hidden"><button id="logout">Logout</button></section>
+</main></div><script src="/static/crm/manager.js"></script></body></html>
