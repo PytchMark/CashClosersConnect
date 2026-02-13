@@ -13,6 +13,11 @@ Internal-first Sales Agent OS + Team CRM built with vanilla HTML/CSS/JS frontend
 - `/crm/agent`
 - `/crm/manager`
 
+## UX Notes
+- Responsive mobile layout: sidebar transforms into a horizontal tab rail on smaller screens.
+- Tables are wrapped in horizontal scroll containers for smaller devices.
+- Includes viewport meta tags for all CRM pages.
+
 ## Core Architecture Rule
 Contacts are single-source records in `crm_contacts`. Pipelines are **filtered views** rendered from `crm_lead_state` joined to `crm_contacts`.
 - Moving a card updates `crm_lead_state.stage_id`
@@ -29,10 +34,28 @@ Required variables:
 - `NODE_ENV`
 - `PORT`
 
-## Run
+## Run (Local)
 ```bash
 npm install
 npm start
+```
+
+## Docker (Cloud Run ready)
+Build and run locally:
+```bash
+docker build -t cashclosers-crm .
+docker run --rm -p 8080:8080 --env-file .env cashclosers-crm
+```
+
+Deploy to Cloud Run (example):
+```bash
+gcloud builds submit --tag gcr.io/PROJECT_ID/cashclosers-crm
+gcloud run deploy cashclosers-crm \
+  --image gcr.io/PROJECT_ID/cashclosers-crm \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars SUPABASE_URL=...,SUPABASE_SERVICE_ROLE_KEY=...,JWT_SECRET=...,CRM_APP_NAME='BizyDepo Sales OS',NODE_ENV=production
 ```
 
 ## Database Schema
@@ -100,12 +123,6 @@ Returns summary:
 ```json
 { "ok": true, "summary": { "inserted": 0, "updated": 0, "skipped": 0, "total": 0 } }
 ```
-
-## Cloud Run Deployment Notes
-- Bind server to `PORT`
-- Use Supabase service role key on backend only
-- Set all env vars from `.env.example`
-- Ensure JWT secret is high-entropy in production
 
 ## Reliability + Security Rules Implemented
 - Input validation on all mutation endpoints
