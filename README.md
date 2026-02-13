@@ -58,6 +58,14 @@ gcloud run deploy cashclosers-crm \
   --set-env-vars SUPABASE_URL=...,SUPABASE_SERVICE_ROLE_KEY=...,JWT_SECRET=...,CRM_APP_NAME='BizyDepo Sales OS',NODE_ENV=production
 ```
 
+
+## Cloud Run Troubleshooting (PORT=8080 startup error)
+If Cloud Run reports that the container did not listen on `PORT=8080` in time:
+- Ensure these env vars are set on the Cloud Run service: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`.
+- Confirm startup command is default (`npm start`) and container port is `8080`.
+- Verify app health endpoint: `GET /health` (does not require DB access).
+- This app now lazy-initializes Supabase, so missing Supabase env vars no longer crash boot; CRM API calls will return a structured `MISSING_ENV` error until vars are configured.
+
 ## Database Schema
 Full schema is in `db/schema.sql` and includes:
 - `crm_users`
