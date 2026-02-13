@@ -14,6 +14,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
 const TOKEN_TTL = '24h';
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const ENV_ADMIN_USERNAME = process.env.CRM_ADMIN_USERNAME || '';
+const ENV_ADMIN_EMAIL = process.env.CRM_ADMIN_EMAIL || '';
+const ENV_ADMIN_ROLE = process.env.CRM_ADMIN_ROLE || 'manager';
+const ENV_ADMIN_PASSCODE = process.env.CRM_ADMIN_PASSCODE || '';
+const ENV_ADMIN_PASSCODE_HASH = process.env.CRM_ADMIN_PASSCODE_HASH || '';
 
 class RestQuery {
   constructor(client, table) {
@@ -125,6 +130,34 @@ function makeToken(user) {
   return jwt.sign({ sub: user.id, role: user.role, email: user.email, username: user.username }, JWT_SECRET, { expiresIn: TOKEN_TTL });
 }
 
+async function loginFromEnvAdmin(identifier, passcode) {
+  if (!identifier || !passcode) return null;
+  if (!ENV_ADMIN_USERNAME && !ENV_ADMIN_EMAIL) return null;
+
+  const normalizedIdentifier = String(identifier).toLowerCase();
+  const matchesUsername = ENV_ADMIN_USERNAME && normalizedIdentifier === ENV_ADMIN_USERNAME.toLowerCase();
+  const matchesEmail = ENV_ADMIN_EMAIL && normalizedIdentifier === ENV_ADMIN_EMAIL.toLowerCase();
+  if (!matchesUsername && !matchesEmail) return null;
+
+  let passOk = false;
+  if (ENV_ADMIN_PASSCODE_HASH) {
+    passOk = await bcrypt.compare(String(passcode), ENV_ADMIN_PASSCODE_HASH);
+  } else if (ENV_ADMIN_PASSCODE) {
+    passOk = String(passcode) === ENV_ADMIN_PASSCODE;
+  }
+
+  if (!passOk) return { invalid: true };
+
+  return {
+    user: {
+      id: 'env-admin',
+      role: ENV_ADMIN_ROLE,
+      email: ENV_ADMIN_EMAIL || null,
+      username: ENV_ADMIN_USERNAME || ENV_ADMIN_EMAIL || 'admin'
+    }
+  };
+}
+
 async function auth(req, res, next) {
   const h = req.headers.authorization || '';
   const token = h.startsWith('Bearer ') ? h.slice(7) : null;
@@ -169,10 +202,17 @@ app.get('/crm/agent', (_req, res) => res.sendFile(path.join(__dirname, 'public/c
 app.get('/crm/manager', (_req, res) => res.sendFile(path.join(__dirname, 'public/crm/manager.html')));
 
 app.post('/api/crm/login', async (req, res) => {
-  const db = requireSupabase(res);
-  if (!db) return;
   const { identifier, passcode } = req.body || {};
   if (!identifier || !passcode) return sendError(res, 400, 'identifier and passcode are required.');
+
+  const envAdmin = await loginFromEnvAdmin(identifier, passcode);
+  if (envAdmin?.invalid) return sendError(res, 401, 'Invalid credentials.', 'INVALID_CREDENTIALS');
+  if (envAdmin?.user) {
+    return res.json({ ok: true, token: makeToken(envAdmin.user), user: envAdmin.user });
+  }
+
+  const db = requireSupabase(res);
+  if (!db) return;
 
   const q = db.from('crm_users').select('*').eq('active', true).or(`username.eq.${identifier},email.eq.${identifier}`).limit(1);
   const { data, error } = await q;
