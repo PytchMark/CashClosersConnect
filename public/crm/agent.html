@@ -1,0 +1,14 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Agent Portal</title><link rel="stylesheet" href="/static/crm/styles.css"></head>
+<body><div class="app"><aside class="sidebar"><div class="brand">Agent OS</div>
+<div class="sidebar-nav"><button class="nav-btn active" data-tab="board">Pipeline Board</button>
+<button class="nav-btn" data-tab="my-leads">My Leads</button>
+<button class="nav-btn" data-tab="all-contacts">All Contacts</button>
+<button class="nav-btn" data-tab="followups">Follow Ups</button>
+<button class="nav-btn" data-tab="settings">Settings</button></div>
+</aside><main class="main"><div class="header"><input id="search" placeholder="Search leads"><div class="chip" id="userChip"></div></div>
+<section id="board" class="tab card"><div class="grid-2"><select id="pipelineSelect"></select><button id="reloadBoard">Reload</button></div><div class="kanban" id="kanban"></div></section>
+<section id="my-leads" class="tab card hidden"><h3>My Leads</h3><div class="table-wrap"><table class="table" id="myLeadsTable"></table></div></section>
+<section id="all-contacts" class="tab card hidden"><h3>All Contacts</h3><div class="table-wrap"><table class="table" id="contactsTable"></table></div></section>
+<section id="followups" class="tab card hidden"><h3>Today / Overdue Follow Ups</h3><ul id="followList"></ul></section>
+<section id="settings" class="tab card hidden"><button id="logout">Logout</button></section>
+</main></div><script src="/static/crm/agent.js"></script></body></html>
