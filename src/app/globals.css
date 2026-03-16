@@ -1,0 +1,263 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gold-primary: #D4AF37;
+  --gold-light: #F5C842;
+  --gold-dark: #B8962F;
+  --bg-dark: #0A0A0A;
+  --panel-dark: #111111;
+  --panel-light: #1A1A1A;
+  --border-dark: #2A2A2A;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-dark);
+  color: #FFFFFF;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-dark);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-primary);
+}
+
+/* Selection */
+::selection {
+  background: var(--gold-primary);
+  color: #000000;
+}
+
+/* Focus States */
+*:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .text-gold-gradient {
+    background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .border-gold-gradient {
+    border-image: linear-gradient(135deg, var(--gold-primary), var(--gold-light)) 1;
+  }
+
+  .glass-panel {
+    background: rgba(17, 17, 17, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-dark);
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  }
+
+  .gold-glow-hover:hover {
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+  }
+
+  /* Message Bubbles */
+  .message-inbound {
+    background: var(--panel-light);
+    border-radius: 18px 18px 18px 4px;
+  }
+
+  .message-outbound {
+    background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-primary) 100%);
+    border-radius: 18px 18px 4px 18px;
+    color: #000000;
+  }
+
+  /* Status Indicators */
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .status-online {
+    background: #10B981;
+    box-shadow: 0 0 8px #10B981;
+  }
+
+  .status-away {
+    background: #F59E0B;
+  }
+
+  .status-offline {
+    background: #6B7280;
+  }
+
+  /* Priority Badges */
+  .priority-low {
+    background: #374151;
+    color: #9CA3AF;
+  }
+
+  .priority-normal {
+    background: #1F2937;
+    color: #E5E7EB;
+  }
+
+  .priority-high {
+    background: rgba(245, 158, 11, 0.2);
+    color: #F59E0B;
+  }
+
+  .priority-urgent {
+    background: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+    animation: pulse 2s infinite;
+  }
+
+  /* Unread Badge */
+  .unread-badge {
+    background: var(--gold-primary);
+    color: #000000;
+    font-weight: 600;
+    font-size: 11px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+  }
+}
+
+/* Animation for pulse */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Audio Player Styles */
+.audio-player {
+  background: var(--panel-light);
+  border-radius: 24px;
+  padding: 8px 16px;
+}
+
+.audio-waveform {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+}
+
+.audio-waveform-bar {
+  width: 3px;
+  background: var(--gold-primary);
+  border-radius: 2px;
+  transition: height 0.1s ease;
+}
+
+/* WhatsApp-like styling */
+.whatsapp-timestamp {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.whatsapp-status-icon {
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+/* Kanban Styles */
+.kanban-column {
+  min-height: 400px;
+  background: var(--panel-dark);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.kanban-card {
+  background: var(--panel-light);
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: grab;
+  transition: all 0.2s ease;
+}
+
+.kanban-card:hover {
+  border-color: var(--gold-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.kanban-card:active {
+  cursor: grabbing;
+}
+
+.kanban-card.dragging {
+  opacity: 0.5;
+  transform: rotate(3deg);
+}
+
+/* Template Required Warning */
+.template-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  color: #F59E0B;
+}
+
+/* Voice Note Styling */
+.voice-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  min-width: 200px;
+}
+
+.voice-note-play {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.voice-note-play:hover {
+  transform: scale(1.1);
+}

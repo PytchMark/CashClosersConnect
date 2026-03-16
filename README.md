@@ -1,173 +1,183 @@
-# CashClosersConnect — Sales OS CRM (MVP v1)
+# Cash Closers WhatsApp CRM
 
-Internal-first Sales Agent OS + Team CRM built with vanilla HTML/CSS/JS frontend and Node/Express backend on Supabase Postgres.
+Internal multi-tenant WhatsApp CRM for Cash Closers Virtual Sales Agency.
 
-## Stack
-- Frontend: Vanilla HTML/CSS/JS under `public/crm`
-- Backend: Node + Express in `server.js`
-- DB: Supabase Postgres (`db/schema.sql`)
-- Auth: DB credentials + bcrypt passcode hash + JWT (no Supabase Auth)
+## Tech Stack
 
-## App Routes
-- `/crm/login`
-- `/crm/agent`
-- `/crm/manager`
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth with Google OAuth
+- **Messaging**: Meta WhatsApp Cloud API
+- **Real-time**: Supabase Realtime
 
-## UX Notes
-- Responsive mobile layout: sidebar transforms into a horizontal tab rail on smaller screens.
-- Tables are wrapped in horizontal scroll containers for smaller devices.
-- Includes viewport meta tags for all CRM pages.
+## Features
 
-## Core Architecture Rule
-Contacts are single-source records in `crm_contacts`. Pipelines are **filtered views** rendered from `crm_lead_state` joined to `crm_contacts`.
-- Moving a card updates `crm_lead_state.stage_id`
-- Do not duplicate contacts between pipelines
+### Core Features
+- 📱 WhatsApp message inbox with real-time updates
+- 👥 Multi-tenant workspace isolation
+- 🏷️ Contact management with tags and lead stages
+- 📊 Kanban pipeline for lead tracking
+- 📝 Message templates management
+- 🎤 Voice note support (send/receive)
+- 🔐 Role-based access control
 
-## Environment
-Copy `.env.example` to `.env`.
+### WhatsApp Integration
+- Inbound message handling via webhooks
+- Outbound message sending (text, media, templates)
+- Customer service window enforcement (24h rule)
+- Message status tracking (sent, delivered, read)
+- Media file handling
 
-Required variables:
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `JWT_SECRET`
-- `CRM_APP_NAME`
-- `NODE_ENV`
-- `PORT`
-- Optional Cloud Run admin login: `CRM_ADMIN_USERNAME` and/or `CRM_ADMIN_EMAIL`, plus either `CRM_ADMIN_PASSCODE_HASH` (recommended) or `CRM_ADMIN_PASSCODE` (quick setup).
+## Quick Start
 
-## Run (Local)
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- Supabase account
+- Meta Developer account
+
+### Installation
+
 ```bash
+# Clone the repository
+git clone <repo-url>
+cd cashclosers-crm
+
+# Install dependencies
 npm install
-npm start
+
+# Copy environment variables
+cp .env.example .env.local
+
+# Run development server
+npm run dev
 ```
 
-## Docker (Cloud Run ready)
-Build and run locally:
-```bash
-docker build -t cashclosers-crm .
-docker run --rm -p 8080:8080 --env-file .env cashclosers-crm
+### Environment Variables
+
+See `.env.example` for all required variables. Key ones:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+WHATSAPP_SYSTEM_USER_TOKEN=
+WHATSAPP_WEBHOOK_VERIFY_TOKEN=
 ```
 
-Deploy to Cloud Run (example):
+## Project Structure
+
+```
+/app
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── api/               # API routes
+│   │   │   ├── webhooks/      # WhatsApp webhooks
+│   │   │   └── whatsapp/      # WhatsApp send API
+│   │   ├── auth/              # Auth callback
+│   │   ├── dashboard/         # Dashboard page
+│   │   ├── login/             # Login page
+│   │   └── workspace/         # Workspace pages
+│   │       └── [workspaceId]/
+│   │           ├── inbox/     # Message inbox
+│   │           ├── contacts/  # Contact list
+│   │           ├── pipeline/  # Kanban board
+│   │           ├── templates/ # Message templates
+│   │           └── settings/  # Workspace settings
+│   ├── components/            # React components
+│   │   ├── inbox/            # Inbox components
+│   │   ├── contacts/         # Contact components
+│   │   ├── pipeline/         # Pipeline components
+│   │   ├── templates/        # Template components
+│   │   ├── settings/         # Settings components
+│   │   └── shared/           # Shared components
+│   ├── lib/                  # Utilities
+│   │   ├── supabase/        # Supabase clients
+│   │   └── utils.ts         # Helper functions
+│   └── types/               # TypeScript types
+│       ├── database.ts      # Supabase types
+│       └── whatsapp.ts      # WhatsApp API types
+├── supabase/
+│   ├── migrations/          # SQL migrations
+│   └── seeds/               # Seed data
+└── docs/
+    └── setup.md             # Setup guide
+```
+
+## Database Schema
+
+See `supabase/migrations/001_initial_schema.sql` for full schema.
+
+Key tables:
+- `profiles` - User profiles (linked to Supabase Auth)
+- `workspaces` - Client workspaces
+- `workspace_members` - User-workspace assignments
+- `contacts` - Contact/lead records
+- `conversations` - Message threads
+- `messages` - Individual messages
+- `templates` - WhatsApp message templates
+- `webhook_events` - Raw webhook payloads
+
+## API Endpoints
+
+### Webhooks
+- `GET /api/webhooks/whatsapp` - Webhook verification
+- `POST /api/webhooks/whatsapp` - Receive WhatsApp events
+
+### WhatsApp
+- `POST /api/whatsapp/send` - Send message
+
+## Deployment
+
+### Google Cloud Run
+
 ```bash
+# Build container
 gcloud builds submit --tag gcr.io/PROJECT_ID/cashclosers-crm
+
+# Deploy
 gcloud run deploy cashclosers-crm \
   --image gcr.io/PROJECT_ID/cashclosers-crm \
   --platform managed \
   --region us-central1 \
-  --allow-unauthenticated \
-  --set-env-vars SUPABASE_URL=...,SUPABASE_SERVICE_ROLE_KEY=...,JWT_SECRET=...,CRM_APP_NAME='BizyDepo Sales OS',NODE_ENV=production,CRM_ADMIN_USERNAME=admin,CRM_ADMIN_EMAIL=admin@example.com,CRM_ADMIN_PASSCODE_HASH='...bcrypt-hash...'
+  --allow-unauthenticated
 ```
 
+Set environment variables in Cloud Run service configuration.
 
+## Design System
 
-## Cloud Run Admin Login via Env Vars
-You can allow admin login without a DB user by setting env vars on Cloud Run:
-- `CRM_ADMIN_USERNAME` and/or `CRM_ADMIN_EMAIL`
-- `CRM_ADMIN_ROLE` (defaults to `manager`)
-- `CRM_ADMIN_PASSCODE_HASH` (recommended bcrypt hash) or `CRM_ADMIN_PASSCODE`
-- If `CRM_ADMIN_PASSCODE_HASH` is not a bcrypt hash string, it will be treated as a plaintext passcode value for backward compatibility.
+### Colors
+- **Primary Gold**: `#D4AF37`
+- **Background**: `#0A0A0A`
+- **Panel**: `#111111`
+- **Border**: `#2A2A2A`
 
-Login flow checks env-admin credentials first, then falls back to DB (`crm_users`).
+### Typography
+- Font: Geist Sans / Mono
+- Scale: Tailwind default
 
-Example (set hashed passcode):
-```bash
-node -e "const bcrypt=require('bcryptjs'); bcrypt.hash(process.argv[1],10).then(h=>console.log(h));" 'YourStrongPasscode'
-```
+## Security
 
-## Cloud Run Troubleshooting (PORT=8080 startup error)
-If Cloud Run reports that the container did not listen on `PORT=8080` in time:
-- Ensure these env vars are set on the Cloud Run service: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`.
-- Confirm startup command is default (`npm start`) and container port is `8080`.
-- Verify app health endpoint: `GET /health` (does not require DB access).
-- This app now lazy-initializes Supabase, so missing Supabase env vars no longer crash boot; CRM API calls will return a structured `MISSING_ENV` error until vars are configured.
+- Row Level Security (RLS) on all tables
+- JWT-based authentication via Supabase
+- Workspace-scoped data isolation
+- Server-side WhatsApp token storage
+- Audit logging for sensitive actions
 
-## Common First-Run Issues
-### 1) `Cannot GET /`
-- Root URL now redirects to `/crm/login`.
-- You can always open the app directly at `/crm/login`.
+## Contributing
 
-### 2) App opens but shows no data
-- Run `db/schema.sql` in Supabase SQL editor (creates CRM tables).
-- Then run `db/seed.sql` (creates sample manager, agent, account, and pipeline stages).
-- Verify your Cloud Run env vars point to the same Supabase project where you ran the SQL.
+1. Create feature branch
+2. Make changes
+3. Run linter: `npm run lint`
+4. Submit pull request
 
-### 3) Invalid credentials with env-admin set
-- Ensure your Cloud Run revision includes `CRM_ADMIN_USERNAME` or `CRM_ADMIN_EMAIL`.
-- If using `CRM_ADMIN_PASSCODE_HASH`, it should look like a bcrypt hash (`$2a$...`, `$2b$...`, `$2y$...`).
-- If you set a plain value in `CRM_ADMIN_PASSCODE_HASH` by mistake, login now accepts it as plain text; you can also move it to `CRM_ADMIN_PASSCODE`.
+## License
 
-## Database Schema
-Full schema is in `db/schema.sql` and includes:
-- `crm_users`
-- `crm_accounts`
-- `crm_contacts`
-- `crm_pipelines`
-- `crm_pipeline_stages`
-- `crm_lead_state`
-- `crm_notes`
-- `crm_activities`
+Proprietary - Cash Closers Jamaica
 
-Apply schema in Supabase SQL editor:
-```sql
--- paste db/schema.sql
-```
+## Support
 
-## Seed Data
-Use `db/seed.sql` as a base:
-1. Create manager + sample agent
-2. Create global pipeline + standard stages
-3. Add account + sample rows
-
-> Update the sample bcrypt hash if you want a different passcode.
-
-## API Overview
-### Auth
-- `POST /api/crm/login` `{ identifier, passcode }`
-- `GET /api/crm/me`
-
-### Manager
-- `GET/POST /api/crm/users`
-- `POST /api/crm/users/:id/reset-passcode`
-- `GET/POST /api/crm/accounts`
-- `GET/POST /api/crm/pipelines`
-- `GET/POST /api/crm/pipelines/:id/stages`
-- `GET /api/crm/contacts?q=&account_id=&owner_user_id=&tag=`
-- `POST /api/crm/contacts`
-- `POST /api/crm/assign`
-- `POST /api/crm/import/contacts` (multipart CSV field name: `file`)
-
-### Agent
-- `GET /api/crm/my/board?p=<pipeline_id>`
-- `POST /api/crm/lead/move`
-- `POST /api/crm/notes`
-- `POST /api/crm/followup`
-- `POST /api/crm/lead/status`
-
-### Shared
-- `GET /api/crm/contact/:id/timeline`
-
-## CSV Import Format
-Header best-effort mapping:
-- `first_name`, `last_name` (or single `name` to split)
-- `phone`, `email`, `company`, `parish`
-- `tags` (comma-separated)
-- `account` or `account_name`
-
-Deduping:
-- by `phone` if present
-- else by `email`
-
-Returns summary:
-```json
-{ "ok": true, "summary": { "inserted": 0, "updated": 0, "skipped": 0, "total": 0 } }
-```
-
-## Reliability + Security Rules Implemented
-- Input validation on all mutation endpoints
-- RBAC middleware for manager/agent permissions
-- JWT verification for all CRM APIs
-- Consistent JSON error format:
-```json
-{ "ok": false, "error": "...", "code": "..." }
-```
+Contact: support@cashclosersja.com
