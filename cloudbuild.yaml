@@ -1,0 +1,25 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+
+        if [[ -f "Dockerfile" ]]; then
+          CONTEXT="."
+        elif [[ -f "CashClosersConnect/Dockerfile" ]]; then
+          CONTEXT="CashClosersConnect"
+        else
+          echo "Dockerfile not found in /workspace or /workspace/CashClosersConnect"
+          exit 1
+        fi
+
+        echo "Using Docker build context: ${CONTEXT}"
+        docker build -t "${_IMAGE}" "${CONTEXT}"
+
+images:
+  - "${_IMAGE}"
+
+substitutions:
+  _IMAGE: "gcr.io/$PROJECT_ID/cashclosers-crm"

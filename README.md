@@ -134,8 +134,8 @@ Key tables:
 ### Google Cloud Run
 
 ```bash
-# Build container
-gcloud builds submit --tag gcr.io/PROJECT_ID/cashclosers-crm
+# Build container (uses cloudbuild.yaml to resolve Docker context robustly)
+gcloud builds submit --config cloudbuild.yaml
 
 # Deploy
 gcloud run deploy cashclosers-crm \
@@ -144,6 +144,9 @@ gcloud run deploy cashclosers-crm \
   --region us-central1 \
   --allow-unauthenticated
 ```
+
+If your Cloud Build trigger uses an inline Docker step, make sure the build context points at
+this repository root where `Dockerfile` lives, or switch the trigger to use `cloudbuild.yaml`.
 
 Set environment variables in Cloud Run service configuration.
 
