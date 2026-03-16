@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import type { Profile, Workspace, WorkspaceMember } from "@/types/database";
+import { BrandLogo } from "@/components/shared/BrandLogo";
 
 interface DashboardContentProps {
   user: User;
@@ -50,9 +51,7 @@ export function DashboardContent({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-gold rounded-lg flex items-center justify-center">
-                <span className="text-lg font-bold text-black">CC</span>
-              </div>
+              <BrandLogo size={40} className="rounded-lg" />
               <div>
                 <h1 className="text-lg font-semibold">Cash Closers CRM</h1>
                 <p className="text-xs text-dark-400">Dashboard</p>
