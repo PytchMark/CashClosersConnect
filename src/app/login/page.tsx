@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { BrandLogo } from "@/components/shared/BrandLogo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -70,9 +71,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <div className="w-16 h-16 bg-gradient-gold rounded-xl flex items-center justify-center shadow-gold">
-            <span className="text-2xl font-bold text-black">CC</span>
-          </div>
+          <BrandLogo size={72} />
         </div>
 
         {/* Card */}

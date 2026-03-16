@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/shared/BrandLogo";
 
 export default function Home() {
   return (
@@ -6,9 +7,7 @@ export default function Home() {
       <div className="text-center space-y-8 px-4">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <div className="w-20 h-20 bg-gradient-gold rounded-2xl flex items-center justify-center shadow-gold">
-            <span className="text-3xl font-bold text-black">CC</span>
-          </div>
+          <BrandLogo size={88} className="rounded-2xl" />
         </div>
 
         <h1 className="text-4xl md:text-5xl font-bold">
